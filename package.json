@@ -1,6 +1,6 @@
 {
-  "name": "@mstarsys/gitlab-dingtalk-cli",
-  "version": "1.0.2",
+  "name": "gitlab-dingtalk-cli",
+  "version": "1.0.1",
   "description": "Gitlab-CI 往Dingtalk推送消息的cli工具",
   "main": "bin/index",
   "bin": {
