@@ -1,0 +1,29 @@
+{
+  "name": "@mstarsys/gitlab-dingtalk-cli",
+  "version": "1.0.2",
+  "description": "Gitlab-CI 往Dingtalk推送消息的cli工具",
+  "main": "bin/index",
+  "bin": {
+    "gitlab-dingtalk-cli": "bin/index"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup src/index.js --dir bin"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "keywords": [
+    "gitlab ci",
+    "dingtalk",
+    "robot"
+  ],
+  "author": "chandq",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "crypto": "^1.0.1",
+    "yargs": "^17.7.2"
+  }
+}

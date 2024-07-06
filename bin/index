@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+
+const { resolve } = require('path');
+const argv = require('yargs').argv;
+const { name, version } = require(resolve(process.cwd(), './package.json'));
+
+const DingtalkBot = require('../src/dingtalkBot');
+const robot = new DingtalkBot({
+  baseUrl: 'https://oapi.dingtalk.com/robot/send',
+  accessToken: process.env.CI_DINGTALK_TOKEN,
+  secret: process.env.CI_DINGTALK_SECRET
+});
+
+async function sendGitlabBuildInfor() {
+  const timeZone = argv._[0];
+  const gitlabUserName = process.env.GITLAB_USER_NAME;
+  const phoneNumber = process.env[gitlabUserName] || process.env.PHONENUMBER; // 在gitlab CI/CD上配置GITLAB_USER_NAME映射的电话号码
+  const branch = process.env.CI_COMMIT_REF_NAME;
+  const project = process.env.CI_PROJECT_NAME;
+  const projectUrl = process.env.CI_PROJECT_URL;
+  const commitId = process.env.CI_COMMIT_SHORT_SHA;
+  const commitAuthor = process.env.CI_COMMIT_AUTHOR;
+  // const email = process.env.GITLAB_USER_EMAIL && process.env.GITLAB_USER_EMAIL.replace('@', '\\@'); // 替换@为\\@防止钉钉解析为链接样式
+  // const message = process.env.CI_COMMIT_MESSAGE;
+  const ciPipelineUrl = process.env.CI_PIPELINE_URL.replace('http://', 'https://');
+  const branchUrl = `${projectUrl}/tree/${branch}`;
+  const commitIDUrl = `${projectUrl}/commit/${commitId}`;
+  const date = new Date().toLocaleString(Intl.DateTimeFormat().resolvedOptions().locale, {
+    hour12: false,
+    timeZone: timeZone ? timeZone : 'Asia/Shanghai'
+  });
+
+  let card = {
+    title: `${project}的${branch}分支的构建详情`,
+    text: `
+    \n > ### ----发布信息----
+    \n **构建项目**: [${project}](${projectUrl})
+    \n **包版本**: ${name}  v${version}
+    \n **构建commitID**: [${commitId}](${commitIDUrl})
+    \n **构建分支**: [${branch}](${branchUrl})
+    \n **构建状态**: ${argv.status ? '失败' : '成功'}
+    \n **构建时间**: ${date}
+    \n **提交人**: *${commitAuthor}*
+    \n
+    `,
+    btnOrientation: '0',
+    btns: [
+      {
+        title: '查看详情',
+        actionURL: ciPipelineUrl
+      }
+    ]
+  };
+  const res = await robot.actionCard(card);
+  const { status } = res;
+  /* 如果有gitlab上配置电话号码变量且前面相应成功, @指定构建人 */
+  if (phoneNumber && status === 200) {
+    await robot.text('请查收你的构建信息', {
+      atMobiles: [phoneNumber],
+      isAtAll: false
+    });
+    process.exit(argv.status);
+  }
+}
+
+(() => {
+  /* 如果不在gitlab runner 环境中执行, 退出脚本 */
+  if (!process.env.CI_PIPELINE_URL) return process.exit(argv.status);
+  sendGitlabBuildInfor();
+})();
