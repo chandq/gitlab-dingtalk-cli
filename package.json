@@ -1,7 +1,7 @@
 {
   "name": "gitlab-dingtalk-cli",
-  "version": "1.0.1",
-  "description": "Gitlab-CI 往Dingtalk推送消息的cli工具",
+  "version": "1.0.2",
+  "description": "Gitlab-CI 往DingTalk推送消息的cli工具",
   "main": "bin/index",
   "bin": {
     "gitlab-dingtalk-cli": "bin/index"
@@ -15,11 +15,13 @@
     "src"
   ],
   "keywords": [
-    "gitlab ci",
-    "dingtalk",
-    "robot"
+    "Gitlab CI",
+    "DingTalk",
+    "robot",
+    "Webhook"
   ],
   "author": "chandq",
+  "repository": "git@github.com:chandq/gitlab-dingtalk-cli.git",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.7.2",
